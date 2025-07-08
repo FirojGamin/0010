@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModernBlog - Where Stories Come to Life</title>
+    <meta name="description" content="Discover amazing stories, insights, and ideas from writers around the world. A modern blog platform with stunning animations and customizable interface.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Framer Motion (via CDN alternative) -->
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        /* CSS Variables for Customization */
+        :root {
+            --primary: 59 130 246;
+            --primary-foreground: 255 255 255;
+            --background: 255 255 255;
+            --foreground: 15 23 42;
+            --muted: 248 250 252;
+            --muted-foreground: 100 116 139;
+            --border: 226 232 240;
+            --accent-color: #3b82f6;
+            --base-font-size: 16px;
+            --animation-duration: 0.6s;
+            --transition-duration: 0.3s;
+        }
+        
+        .dark {
+            --background: 15 23 42;
+            --foreground: 248 250 252;
+            --muted: 30 41 59;
+            --muted-foreground: 148 163 184;
+            --border: 51 65 85;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: var(--base-font-size);
+            background-color: rgb(var(--background));
+            color: rgb(var(--foreground));
+            transition: all var(--transition-duration) ease;
+        }
+        
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-color: var(--accent-color); }
+            51%, 100% { border-color: transparent; }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn var(--animation-duration) ease-out;
+        }
+        
+        .animate-slide-in {
+            animation: slideIn var(--animation-duration) ease-out;
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid var(--accent-color);
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+        }
+        
+        /* Hover Effects */
+        .hover-lift {
+            transition: transform var(--transition-duration) ease, box-shadow var(--transition-duration) ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Glass Morphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgb(var(--muted));
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgb(var(--muted-foreground));
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgb(var(--foreground));
+        }
+        
+        /* Background Patterns */
+        .pattern-dots {
+            background-image: radial-gradient(circle, #ddd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .pattern-grid {
+            background-image: 
+                linear-gradient(#ddd 1px, transparent 1px),
+                linear-gradient(90deg, #ddd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Layout Customizations */
+        [data-layout="compact"] .container {
+            max-width: 80rem;
+        }
+        
+        [data-layout="wide"] .container {
+            max-width: none;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        
+        /* Card Styles */
+        [data-card-style="border"] .card {
+            box-shadow: none;
+            border: 2px solid rgb(var(--border));
+        }
+        
+        [data-card-style="flat"] .card {
+            box-shadow: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.125rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 bg-white/95 backdrop-blur-md shadow-lg dark:bg-slate-900/95">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="flex items-center space-x-2 cursor-pointer">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">MB</span>
+                        </div>
+                        <span class="text-xl font-bold text-gray-900 dark:text-white">ModernBlog</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link text-blue-600 dark:text-blue-400 font-semibold">Home</a>
+                    <a href="#categories" class="nav-link text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">Categories</a>
+                    <a href="#about" class="nav-link text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">About</a>
+                    <a href="#contact" class="nav-link text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">Contact</a>
+                    
+                    <!-- Search -->
+                    <div class="relative">
+                        <input type="text" placeholder="Search..." class="w-64 pl-10 pr-4 py-2 bg-white/80 dark:bg-slate-800/80 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    
+                    <!-- Settings -->
+                    <button id="settings-btn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                        <svg id="sun-icon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moon-icon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-900 shadow-lg">
+            <div class="px-4 py-4 space-y-4">
+                <a href="#home" class="block py-2 text-blue-600 dark:text-blue-400 font-semibold">Home</a>
+                <a href="#categories" class="block py-2 text-gray-700 dark:text-gray-300">Categories</a>
+                <a href="#about" class="block py-2 text-gray-700 dark:text-gray-300">About</a>
+                <a href="#contact" class="block py-2 text-gray-700 dark:text-gray-300">Contact</a>
+                <input type="text" placeholder="Search..." class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background Images -->
+        <div class="absolute inset-0">
+            <div id="hero-bg" class="absolute inset-0 bg-cover bg-center transition-opacity duration-1500" 
+                 style="background-image: url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop')">
+            </div>
+            <div class="absolute inset-0 bg-black/40"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60"></div>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
+            <h1 class="hero-title text-5xl md:text-7xl font-bold mb-6 leading-tight animate-fade-in">
+                Where Stories
+                <span class="block gradient-text">Come to Life</span>
+            </h1>
+            
+            <div class="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
+                <span class="typewriter">Discover amazing stories, insights, and ideas from writers around the world</span>
+            </div>
+            
+            <div class="space-x-4 animate-fade-in">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:scale-105 transition-all duration-300">
+                    Start Reading
+                </button>
+                <button class="border-2 border-white text-white px-8 py-4 text-lg font-semibold rounded-lg hover:bg-white hover:text-gray-900 transition-all duration-300">
+                    Learn More
+                </button>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-8 h-8 text-white cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Main Content Column -->
+            <div class="lg:col-span-3">
+                
+                <!-- Trending Slider -->
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 flex items-center animate-fade-in">
+                        <svg class="text-orange-500 mr-3 w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
+                        </svg>
+                        Trending Posts
+                    </h2>
+                    
+                    <div class="relative overflow-hidden rounded-2xl shadow-2xl">
+                        <div id="trending-slider" class="relative h-96">
+                            <!-- Trending Post 1 -->
+                            <div class="trending-slide absolute inset-0 opacity-100 transition-opacity duration-500"
+                                 style="background-image: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&w=1200&h=600&fit=crop')">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                <div class="absolute bottom-8 left-8 text-white max-w-2xl">
+                                    <span class="inline-block px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full mb-3">Technology</span>
+                                    <h3 class="text-3xl font-bold mb-3">The Future of Remote Work</h3>
+                                    <p class="text-gray-200 mb-4 text-lg">Exploring how technology is reshaping the modern workplace and what it means for the future of work.</p>
+                                    <div class="flex items-center text-sm text-gray-300">
+                                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&w=400&h=400&fit=crop&crop=face" alt="Author" class="w-8 h-8 rounded-full mr-3">
+                                        <span>John Smith • 8 min read</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation Controls -->
+                        <button id="prev-slide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button id="next-slide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Featured Categories -->
+                <section id="categories" class="mb-16">
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 flex items-center animate-fade-in">
+                        <svg class="text-purple-600 mr-3 w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        Featured Categories
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="category-card relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl cursor-pointer hover-lift">
+                            <div class="h-32 bg-blue-600 relative">
+                                <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/20"></div>
+                                <div class="absolute inset-0 flex items-center justify-center text-white">
+                                    <div class="text-center">
+                                        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                                        </svg>
+                                        <h3 class="font-semibold text-lg">Technology</h3>
+                                        <p class="text-xs opacity-90 mt-1">Latest tech trends</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="category-card relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl cursor-pointer hover-lift">
+                            <div class="h-32 bg-purple-600 relative">
+                                <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/20"></div>
+                                <div class="absolute inset-0 flex items-center justify-center text-white">
+                                    <div class="text-center">
+                                        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17v4a2 2 0 002 2h4M11 7h6l4 4v4a2 2 0 01-2 2h-1M11 7L7 3a2 2 0 00-2 2v4M11 7l2-2h4a2 2 0 012 2v1"></path>
+                                        </svg>
+                                        <h3 class="font-semibold text-lg">Design</h3>
+                                        <p class="text-xs opacity-90 mt-1">UI/UX insights</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="category-card relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl cursor-pointer hover-lift">
+                            <div class="h-32 bg-green-600 relative">
+                                <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/20"></div>
+                                <div class="absolute inset-0 flex items-center justify-center text-white">
+                                    <div class="text-center">
+                                        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <h3 class="font-semibold text-lg">Travel</h3>
+                                        <p class="text-xs opacity-90 mt-1">Travel guides</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="category-card relative overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl cursor-pointer hover-lift">
+                            <div class="h-32 bg-orange-600 relative">
+                                <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/20"></div>
+                                <div class="absolute inset-0 flex items-center justify-center text-white">
+                                    <div class="text-center">
+                                        <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        <h3 class="font-semibold text-lg">Lifestyle</h3>
+                                        <p class="text-xs opacity-90 mt-1">Health & wellness</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recent Posts -->
+                <section class="mb-16">
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 animate-fade-in">Recent Posts</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Blog Post 1 -->
+                        <article class="card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover-lift">
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?ixlib=rb-4.0.3&w=1200&h=600&fit=crop" alt="Modern UI/UX Trends" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                <div class="absolute top-4 left-4">
+                                    <span class="bg-purple-600 text-white px-3 py-1 text-sm font-medium rounded-full">Design</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                                    Modern UI/UX Trends
+                                </h3>
+                                <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed">
+                                    Discover the latest design trends shaping user experiences in 2024 and beyond.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&w=400&h=400&fit=crop&crop=face" alt="Sarah Johnson" class="w-10 h-10 rounded-full mr-3 object-cover">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Sarah Johnson</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jan 15, 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>7 min read</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                        
+                        <!-- Blog Post 2 -->
+                        <article class="card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover-lift">
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&w=1200&h=600&fit=crop" alt="Building a Successful Startup" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                <div class="absolute top-4 left-4">
+                                    <span class="bg-red-600 text-white px-3 py-1 text-sm font-medium rounded-full">Business</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                                    Building a Successful Startup in 2024
+                                </h3>
+                                <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed">
+                                    Learn the essential strategies and mindset needed to build and scale a successful startup.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&w=400&h=400&fit=crop&crop=face" alt="Mike Chen" class="w-10 h-10 rounded-full mr-3 object-cover">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Mike Chen</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jan 12, 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>8 min read</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                        
+                        <!-- Blog Post 3 -->
+                        <article class="card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover-lift">
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&w=1200&h=600&fit=crop" alt="Hidden Paradise" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                <div class="absolute top-4 left-4">
+                                    <span class="bg-green-600 text-white px-3 py-1 text-sm font-medium rounded-full">Travel</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                                    Hidden Paradise: Exploring Remote Islands
+                                </h3>
+                                <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed">
+                                    Journey to untouched destinations where crystal clear waters meet pristine beaches.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=400&h=400&fit=crop&crop=face" alt="Alex Rivera" class="w-10 h-10 rounded-full mr-3 object-cover">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Alex Rivera</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jan 10, 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>12 min read</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                        
+                        <!-- Blog Post 4 -->
+                        <article class="card bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover-lift">
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1466637574441-749b8f19452f?ixlib=rb-4.0.3&w=1200&h=600&fit=crop" alt="Mindful Eating" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                <div class="absolute top-4 left-4">
+                                    <span class="bg-orange-600 text-white px-3 py-1 text-sm font-medium rounded-full">Lifestyle</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                                    Mindful Eating: A Guide to Wellness
+                                </h3>
+                                <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed">
+                                    Transform your relationship with food through mindful eating practices that nourish both body and mind.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&w=400&h=400&fit=crop&crop=face" alt="Lisa Wang" class="w-10 h-10 rounded-full mr-3 object-cover">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">Lisa Wang</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jan 8, 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>10 min read</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                    
+                    <!-- Load More Button -->
+                    <div class="text-center mt-12">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 font-semibold rounded-lg shadow-lg hover:scale-105 transition-all duration-300">
+                            Load More Posts
+                            <svg class="ml-2 w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-24 space-y-8">
+                    
+                    <!-- Newsletter Signup -->
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center mb-4">
+                            <svg class="text-blue-600 mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Stay Updated</h3>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+                            Get the latest posts delivered right to your inbox.
+                        </p>
+                        <form class="space-y-3">
+                            <input type="email" placeholder="Enter your email" class="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Popular Posts -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center mb-4">
+                            <svg class="text-yellow-500 mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Popular Posts</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex space-x-3 group cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 p-2 rounded-lg transition-colors">
+                                <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&w=400&h=300&fit=crop" alt="Post" class="w-16 h-12 rounded-lg object-cover flex-shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-sm leading-tight line-clamp-2">
+                                        The Future of Remote Work
+                                    </h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Jan 15, 2024</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-3 group cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 p-2 rounded-lg transition-colors">
+                                <img src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?ixlib=rb-4.0.3&w=400&h=300&fit=crop" alt="Post" class="w-16 h-12 rounded-lg object-cover flex-shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-sm leading-tight line-clamp-2">
+                                        Modern UI/UX Trends
+                                    </h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Jan 12, 2024</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-3 group cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 p-2 rounded-lg transition-colors">
+                                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&w=400&h=300&fit=crop" alt="Post" class="w-16 h-12 rounded-lg object-cover flex-shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-sm leading-tight line-clamp-2">
+                                        Building a Successful Startup
+                                    </h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Jan 10, 2024</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Links -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center mb-4">
+                            <svg class="text-green-600 mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                            </svg>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Follow Us</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <a href="#" class="flex items-center justify-center p-3 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg transition-all duration-200 group">
+                                <svg class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="flex items-center justify-center p-3 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg transition-all duration-200 group">
+                                <svg class="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="flex items-center justify-center p-3 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg transition-all duration-200 group">
+                                <svg class="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.746-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24c6.624 0 11.99-5.367 11.99-12.013C24.007 5.367 18.641.001 12.017.001z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="flex items-center justify-center p-3 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 rounded-lg transition-all duration-200 group">
+                                <svg class="w-5 h-5 text-blue-700 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Popular Tags -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center mb-4">
+                            <svg class="text-purple-600 mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                            </svg>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Popular Tags</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">JavaScript</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">React</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">Design</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">UI/UX</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">Travel</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">Photography</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">Lifestyle</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">Technology</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">Business</span>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200">Health</span>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 dark:bg-slate-900 text-white py-16 relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0 pattern-dots"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand Section -->
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">MB</span>
+                        </div>
+                        <h3 class="text-2xl font-bold">ModernBlog</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4 leading-relaxed">
+                        Discover amazing stories, insights, and ideas from writers around the world.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.746-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24c6.624 0 11.99-5.367 11.99-12.013C24.007 5.367 18.641.001 12.017.001z"/></svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-all duration-200 hover:scale-110">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">Home</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">About</a></li>
+                        <li><a href="#categories" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">Categories</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">Technology</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">Design</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">Travel</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200 block py-1">Lifestyle</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Newsletter
+                    </h4>
+                    <p class="text-gray-400 mb-4">Subscribe to get the latest updates.</p>
+                    <form class="space-y-3">
+                        <input type="email" placeholder="Your email" class="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Bottom Section -->
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+                <p class="text-gray-400 flex items-center justify-center">
+                    © 2024 ModernBlog. All rights reserved. Made with
+                    <svg class="w-4 h-4 text-red-500 fill-current mx-1 animate-pulse" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    for content creators.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="fixed right-0 top-0 h-full w-full max-w-lg bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto transform translate-x-full transition-transform duration-300" id="settings-content">
+            <div class="p-6">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Customization</h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Personalize your experience</p>
+                        </div>
+                    </div>
+                    <button id="close-settings" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Settings Content -->
+                <div class="space-y-6">
+                    <!-- Theme -->
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Theme</h3>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="theme-btn p-3 rounded-lg border-2 border-transparent hover:border-blue-500 transition-colors" data-theme="light">
+                                <div class="w-full h-8 bg-white rounded mb-2 shadow"></div>
+                                <span class="text-sm font-medium">Light</span>
+                            </button>
+                            <button class="theme-btn p-3 rounded-lg border-2 border-transparent hover:border-blue-500 transition-colors" data-theme="dark">
+                                <div class="w-full h-8 bg-slate-800 rounded mb-2"></div>
+                                <span class="text-sm font-medium">Dark</span>
+                            </button>
+                            <button class="theme-btn p-3 rounded-lg border-2 border-transparent hover:border-blue-500 transition-colors" data-theme="auto">
+                                <div class="w-full h-8 bg-gradient-to-r from-white to-slate-800 rounded mb-2"></div>
+                                <span class="text-sm font-medium">Auto</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Accent Color -->
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Accent Color</h3>
+                        <div class="grid grid-cols-4 gap-3 mb-3">
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#3b82f6" style="background-color: #3b82f6;"></button>
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#8b5cf6" style="background-color: #8b5cf6;"></button>
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#10b981" style="background-color: #10b981;"></button>
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#f59e0b" style="background-color: #f59e0b;"></button>
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#ef4444" style="background-color: #ef4444;"></button>
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#ec4899" style="background-color: #ec4899;"></button>
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#14b8a6" style="background-color: #14b8a6;"></button>
+                            <button class="accent-btn w-full h-12 rounded-lg" data-color="#6366f1" style="background-color: #6366f1;"></button>
+                        </div>
+                        <input type="color" id="custom-color" class="w-full h-12 rounded-lg border-2 border-gray-300 dark:border-slate-600" value="#3b82f6">
+                    </div>
+
+                    <!-- Font Size -->
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Font Size</h3>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="font-size-btn p-3 rounded-lg border-2 border-transparent hover:border-blue-500 transition-colors" data-size="14px">
+                                <span class="text-sm">Small</span>
+                            </button>
+                            <button class="font-size-btn p-3 rounded-lg border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30" data-size="16px">
+                                <span class="text-base">Medium</span>
+                            </button>
+                            <button class="font-size-btn p-3 rounded-lg border-2 border-transparent hover:border-blue-500 transition-colors" data-size="18px">
+                                <span class="text-lg">Large</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Background -->
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Background</h3>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-4 gap-2">
+                                <button class="bg-btn h-16 rounded-lg bg-white border-2 border-gray-300" data-bg="solid" data-value="#ffffff"></button>
+                                <button class="bg-btn h-16 rounded-lg border-2 border-gray-300" data-bg="gradient" data-value="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></button>
+                                <button class="bg-btn h-16 rounded-lg border-2 border-gray-300 pattern-dots" data-bg="pattern" data-value="dots"></button>
+                                <button class="bg-btn h-16 rounded-lg border-2 border-gray-300" data-bg="image" data-value="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&w=400&h=300&fit=crop'); background-size: cover;"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Animations -->
+                    <div class="bg-gray-50 dark:bg-slate-800 rounded-xl p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Enable Animations</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Turn off for better performance</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="animations-toggle" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Reset -->
+                    <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-4">
+                        <h3 class="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">Reset Settings</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Reset all customizations to default values.</p>
+                        <button id="reset-settings" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-medium transition-colors">
+                            Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hero background slideshow
+        const heroImages = [
+            'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop',
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop',
+            'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop',
+            'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop'
+        ];
+
+        let currentBgIndex = 0;
+        const heroBg = document.getElementById('hero-bg');
+
+        setInterval(() => {
+            currentBgIndex = (currentBgIndex + 1) % heroImages.length;
+            heroBg.style.backgroundImage = `url('${heroImages[currentBgIndex]}')`;
+        }, 5000);
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        // Settings panel
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsPanel = document.getElementById('settings-panel');
+        const settingsContent = document.getElementById('settings-content');
+        const closeSettings = document.getElementById('close-settings');
+
+        function openSettings() {
+            settingsPanel.classList.remove('hidden');
+            setTimeout(() => {
+                settingsContent.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeSettingsPanel() {
+            settingsContent.classList.add('translate-x-full');
+            setTimeout(() => {
+                settingsPanel.classList.add('hidden');
+            }, 300);
+        }
+
+        settingsBtn.addEventListener('click', openSettings);
+        closeSettings.addEventListener('click', closeSettingsPanel);
+        settingsPanel.addEventListener('click', (e) => {
+            if (e.target === settingsPanel) closeSettingsPanel();
+        });
+
+        // Settings functionality
+        
+        // Theme buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30'));
+                btn.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                
+                if (theme === 'dark') {
+                    html.classList.add('dark');
+                } else if (theme === 'light') {
+                    html.classList.remove('dark');
+                } else {
+                    // Auto theme
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        html.classList.add('dark');
+                    } else {
+                        html.classList.remove('dark');
+                    }
+                }
+                localStorage.setItem('theme', theme);
+            });
+        });
+
+        // Accent color buttons
+        document.querySelectorAll('.accent-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const color = btn.dataset.color;
+                setAccentColor(color);
+                document.getElementById('custom-color').value = color;
+            });
+        });
+
+        document.getElementById('custom-color').addEventListener('change', (e) => {
+            setAccentColor(e.target.value);
+        });
+
+        function setAccentColor(color) {
+            document.documentElement.style.setProperty('--accent-color', color);
+            const hsl = hexToHsl(color);
+            document.documentElement.style.setProperty('--primary', hsl);
+            localStorage.setItem('accentColor', color);
+        }
+
+        // Font size buttons
+        document.querySelectorAll('.font-size-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const size = btn.dataset.size;
+                document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30'));
+                btn.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+                document.documentElement.style.setProperty('--base-font-size', size);
+                localStorage.setItem('fontSize', size);
+            });
+        });
+
+        // Background buttons
+        document.querySelectorAll('.bg-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const bgType = btn.dataset.bg;
+                const bgValue = btn.dataset.value;
+                
+                document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
+                btn.classList.add('ring-2', 'ring-blue-500');
+                
+                if (bgType === 'solid') {
+                    document.body.style.backgroundColor = bgValue;
+                    document.body.style.backgroundImage = 'none';
+                } else if (bgType === 'gradient') {
+                    document.body.style.background = bgValue;
+                } else if (bgType === 'pattern') {
+                    document.body.className = document.body.className.replace(/pattern-\w+/g, '');
+                    document.body.classList.add(`pattern-${bgValue}`);
+                    document.body.style.backgroundImage = '';
+                } else if (bgType === 'image') {
+                    document.body.style.backgroundImage = `url('${bgValue}')`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundPosition = 'center';
+                    document.body.style.backgroundAttachment = 'fixed';
+                }
+                
+                localStorage.setItem('backgroundType', bgType);
+                localStorage.setItem('backgroundValue', bgValue);
+            });
+        });
+
+        // Animations toggle
+        document.getElementById('animations-toggle').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.documentElement.style.removeProperty('--animation-duration');
+                document.documentElement.style.removeProperty('--transition-duration');
+            } else {
+                document.documentElement.style.setProperty('--animation-duration', '0s');
+                document.documentElement.style.setProperty('--transition-duration', '0s');
+            }
+            localStorage.setItem('animationsEnabled', e.target.checked);
+        });
+
+        // Reset settings
+        document.getElementById('reset-settings').addEventListener('click', () => {
+            localStorage.clear();
+            location.reload();
+        });
+
+        // Load saved settings
+        function loadSettings() {
+            const accentColor = localStorage.getItem('accentColor');
+            if (accentColor) setAccentColor(accentColor);
+            
+            const fontSize = localStorage.getItem('fontSize');
+            if (fontSize) {
+                document.documentElement.style.setProperty('--base-font-size', fontSize);
+                document.querySelector(`[data-size="${fontSize}"]`)?.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/30');
+            }
+            
+            const bgType = localStorage.getItem('backgroundType');
+            const bgValue = localStorage.getItem('backgroundValue');
+            if (bgType && bgValue) {
+                const bgBtn = document.querySelector(`[data-bg="${bgType}"][data-value="${bgValue}"]`);
+                if (bgBtn) bgBtn.click();
+            }
+            
+            const animationsEnabled = localStorage.getItem('animationsEnabled');
+            if (animationsEnabled === 'false') {
+                document.getElementById('animations-toggle').checked = false;
+                document.documentElement.style.setProperty('--animation-duration', '0s');
+                document.documentElement.style.setProperty('--transition-duration', '0s');
+            }
+        }
+
+        // Utility functions
+        function hexToHsl(hex) {
+            const r = parseInt(hex.slice(1, 3), 16) / 255;
+            const g = parseInt(hex.slice(3, 5), 16) / 255;
+            const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h = 0, s = 0, l = (max + min) / 2;
+
+            if (max !== min) {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+        }
+
+        // Initialize
+        loadSettings();
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > 100) {
+                navbar.classList.add('bg-white/95', 'dark:bg-slate-900/95', 'backdrop-blur-md', 'shadow-lg');
+                navbar.classList.remove('bg-white/10', 'dark:bg-slate-900/10', 'backdrop-blur-sm');
+            } else {
+                navbar.classList.remove('bg-white/95', 'dark:bg-slate-900/95', 'backdrop-blur-md', 'shadow-lg');
+                navbar.classList.add('bg-white/10', 'dark:bg-slate-900/10', 'backdrop-blur-sm');
+            }
+            
+            lastScrollY = currentScrollY;
+        });
+
+        // Initialize Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.querySelectorAll('.card, .category-card, section h2').forEach(el => {
+            observer.observe(el);
+        });
+
+        console.log('ModernBlog loaded successfully!');
+    </script>
+</body>
+</html>

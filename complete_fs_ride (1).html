@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FS Ride - Travel Billing System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary-color: #6b7280;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --border-color: #e5e7eb;
+            --sidebar-width: 280px;
+            --header-height: 80px;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .logo-text p {
+            font-size: 0.875rem;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .settings-btn,
+        .theme-toggle {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .settings-btn:hover,
+        .theme-toggle:hover {
+            background: var(--light-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+        }
+
+        .page {
+            display: none;
+            padding: 2rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Page Header */
+        .page-header {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            top: -50px;
+            right: -50px;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            bottom: -75px;
+            left: -75px;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-text h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .header-text p {
+            color: var(--secondary-color);
+            font-size: 1.125rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            position: relative;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-background {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            opacity: 0.1;
+        }
+
+        .stat-card.blue .stat-background {
+            background: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .stat-card.green .stat-background {
+            background: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .stat-card.purple .stat-background {
+            background: #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .stat-card.amber .stat-background {
+            background: var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .stat-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .stat-card.blue .stat-icon {
+            color: var(--primary-color);
+        }
+
+        .stat-card.green .stat-icon {
+            color: var(--success-color);
+        }
+
+        .stat-card.purple .stat-icon {
+            color: #8b5cf6;
+        }
+
+        .stat-card.amber .stat-icon {
+            color: var(--warning-color);
+        }
+
+        /* Forms */
+        .invoice-section,
+        .form-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--secondary-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Invoice Items */
+        .invoice-items {
+            margin-bottom: 2rem;
+        }
+
+        .invoice-items h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+        }
+
+        .item-row input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .remove-item {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .remove-item:hover {
+            background: #dc2626;
+        }
+
+        /* Invoice Summary */
+        .invoice-summary {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid var(--border-color);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Tables */
+        .search-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+
+        .filter-section select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            min-width: 150px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: var(--light-color);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--light-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn.edit {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Category badges */
+        .category-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .category-fuel {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .category-maintenance {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .category-toll {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .category-parking {
+            background: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+        }
+
+        .category-food {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .category-other {
+            background: rgba(107, 114, 128, 0.1);
+            color: #374151;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px) scale(0.9); }
+            to { transform: translateY(0) scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .modal-form {
+            padding: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--secondary-color);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .coming-soon i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .coming-soon h2 {
+            font-size: 2rem;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .coming-soon p {
+            color: var(--secondary-color);
+            font-size: 1.125rem;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <!-- Logo/Brand -->
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>FS Ride</h1>
+                        <p>Travel Billing System</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-nav">
+                <div class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-page="invoices">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Invoices</span>
+                </div>
+                <div class="nav-item" data-page="expenses">
+                    <i class="fas fa-receipt"></i>
+                    <span>Expenses</span>
+                </div>
+                <div class="nav-item" data-page="clients">
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
+                </div>
+                <div class="nav-item" data-page="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+            </div>
+
+            <!-- Settings & Theme -->
+            <div class="sidebar-footer">
+                <button class="settings-btn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard">
+                <!-- Header -->
+                <header class="page-header">
+                    <div class="floating-shape shape-1"></div>
+                    <div class="floating-shape shape-2"></div>
+                    
+                    <div class="header-content">
+                        <div class="header-text">
+                            <h1>Dashboard</h1>
+                            <p>Welcome to FS Ride Travel Billing System</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openModal('clientModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Client
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('expenseModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Expense
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card blue" data-stat="invoices">
+                        <div class="stat-background">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Invoices</p>
+                                <p class="stat-value" id="totalInvoices">12</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card green" data-stat="revenue">
+                        <div class="stat-background">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Revenue</p>
+                                <p class="stat-value" id="totalRevenue">₹45,230</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card purple" data-stat="distance">
+                        <div class="stat-background">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Distance</p>
+                                <p class="stat-value" id="totalDistance">1,250 km</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card amber" data-stat="clients">
+                        <div class="stat-background">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Active Clients</p>
+                                <p class="stat-value" id="activeClients">8</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Form -->
+                <div class="invoice-section">
+                    <div class="section-header">
+                        <h2>Create New Invoice</h2>
+                        <p>Generate professional invoices with GST calculations</p>
+                    </div>
+                    
+                    <form class="invoice-form" id="invoiceForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Client</label>
+                                <select id="clientSelect" required>
+                                    <option value="">Select a client</option>
+                                    <option value="1">ABC Corporation</option>
+                                    <option value="2">XYZ Enterprises</option>
+                                    <option value="3">Tech Solutions Ltd</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Invoice Date</label>
+                                <input type="date" id="invoiceDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Due Date</label>
+                                <input type="date" id="dueDate">
+                            </div>
+                            <div class="form-group">
+                                <label>GST Type</label>
+                                <select id="gstType" required>
+                                    <option value="cgst_sgst">CGST + SGST</option>
+                                    <option value="igst">IGST</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Invoice Items -->
+                        <div class="invoice-items">
+                            <h3>Items</h3>
+                            <div class="items-container" id="itemsContainer">
+                                <div class="item-row">
+                                    <input type="text" placeholder="Description" class="item-description" required>
+                                    <input type="number" placeholder="Qty" class="item-quantity" min="1" required>
+                                    <input type="number" placeholder="Rate" class="item-rate" step="0.01" required>
+                                    <input type="number" placeholder="Amount" class="item-amount" readonly>
+                                    <button type="button" class="remove-item" onclick="removeItem(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline" onclick="addItem()">
+                                <i class="fas fa-plus"></i>
+                                Add Item
+                            </button>
+                        </div>
+
+                        <!-- Invoice Summary -->
+                        <div class="invoice-summary">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>CGST (9%):</span>
+                                <span id="cgst">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>SGST (9%):</span>
+                                <span id="sgst">₹0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="total">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Save Invoice
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="generatePDF()">
+                                <i class="fas fa-file-pdf"></i>
+                                Generate PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Clients Page -->
+            <div class="page" id="clients">
+                <header class="page-header">
+                    <div class="header-content">
+                        <div class="header-text">
+                            <h1>Clients</h1>
+                            <p>Manage your client database</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openModal('clientModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Client
+                            </button>
+                            <button class="btn btn-outline" onclick="exportClients()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Search and Filter -->
+                <div class="search-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="clientSearch" placeholder="Search clients by name, email, or phone...">
+                    </div>
+                </div>
+
+                <!-- Clients Table -->
+                <div class="table-container">
+                    <table class="data-table" id="clientsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>GST Number</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody">
+                            <tr>
+                                <td><strong>ABC Corporation</strong></td>
+                                <td>contact@abc.com</td>
+                                <td>+91 9876543210</td>
+                                <td>29ABCDE1234F1Z5</td>
+                                <td>Jan 15, 2025</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>XYZ Enterprises</strong></td>
+                                <td>info@xyz.com</td>
+                                <td>+91 9876543211</td>
+                                <td>29XYZDE1234F1Z5</td>
+                                <td>Jan 20, 2025</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Expenses Page -->
+            <div class="page" id="expenses">
+                <header class="page-header">
+                    <div class="header-content">
+                        <div class="header-text">
+                            <h1>Expenses</h1>
+                            <p>Track and manage your business expenses</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openModal('expenseModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Expense
+                            </button>
+                            <button class="btn btn-outline" onclick="exportExpenses()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Search and Filter -->
+                <div class="search-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="expenseSearch" placeholder="Search expenses by description, category...">
+                    </div>
+                    <div class="filter-section">
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="fuel">Fuel</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="toll">Toll</option>
+                            <option value="parking">Parking</option>
+                            <option value="food">Food</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Expenses Table -->
+                <div class="table-container">
+                    <table class="data-table" id="expensesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Receipt</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody">
+                            <tr>
+                                <td>Jan 15, 2025</td>
+                                <td><span class="category-badge category-fuel">Fuel</span></td>
+                                <td>Petrol for trip to Mumbai</td>
+                                <td><strong>₹2,500.00</strong></td>
+                                <td>RCP001</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jan 18, 2025</td>
+                                <td><span class="category-badge category-toll">Toll</span></td>
+                                <td>Highway toll charges</td>
+                                <td><strong>₹450.00</strong></td>
+                                <td>TOLL123</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Invoices Page -->
+            <div class="page" id="invoices">
+                <div class="coming-soon">
+                    <i class="fas fa-file-invoice"></i>
+                    <h2>Invoices Coming Soon</h2>
+                    <p>This feature is under development and will be available soon.</p>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div class="page" id="analytics">
+                <div class="coming-soon">
+                    <i class="fas fa-chart-bar"></i>
+                    <h2>Analytics Coming Soon</h2>
+                    <p>Detailed analytics and reports will be available soon.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Client Modal -->
+    <div class="modal" id="clientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="clientModalTitle">Add New Client</h2>
+                <button class="close-btn" onclick="closeModal('clientModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="clientForm">
+                <input type="hidden" id="clientId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name *</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="clientEmail" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="clientPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>GST Number</label>
+                        <input type="text" id="clientGst">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="clientAddress" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('clientModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="expenseModalTitle">Add New Expense</h2>
+                <button class="close-btn" onclick="closeModal('expenseModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="expenseForm">
+                <input type="hidden" id="expenseId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date *</label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="expenseCategory" required>
+                            <option value="">Select category</option>
+                            <option value="fuel">Fuel</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="toll">Toll</option>
+                            <option value="parking">Parking</option>
+                            <option value="food">Food</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <input type="text" id="expenseDescription" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Amount *</label>
+                        <input type="number" id="expenseAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Receipt Number</label>
+                        <input type="text" id="expenseReceipt">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="expenseNotes" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('expenseModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Application State
+        let clients = [
+            { id: 1, name: 'ABC Corporation', email: 'contact@abc.com', phone: '+91 9876543210', gst_number: '29ABCDE1234F1Z5', created_at: '2025-01-15' },
+            { id: 2, name: 'XYZ Enterprises', email: 'info@xyz.com', phone: '+91 9876543211', gst_number: '29XYZDE1234F1Z5', created_at: '2025-01-20' },
+            { id: 3, name: 'Tech Solutions Ltd', email: 'hello@tech.com', phone: '+91 9876543212', gst_number: '29TECHDE1234F1Z5', created_at: '2025-01-25' }
+        ];
+        
+        let expenses = [
+            { id: 1, date: '2025-01-15', category: 'fuel', description: 'Petrol for trip to Mumbai', amount: 2500, receipt_number: 'RCP001' },
+            { id: 2, date: '2025-01-18', category: 'toll', description: 'Highway toll charges', amount: 450, receipt_number: 'TOLL123' },
+            { id: 3, date: '2025-01-20', category: 'maintenance', description: 'Car service and oil change', amount: 3200, receipt_number: 'SRV456' }
+        ];
+
+        let currentEditingClient = null;
+        let currentEditingExpense = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            setTodayDate();
+        });
+
+        function initializeApp() {
+            showPage('dashboard');
+            populateClientSelect();
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                });
+            });
+
+            // Invoice form
+            const invoiceForm = document.getElementById('invoiceForm');
+            if (invoiceForm) {
+                invoiceForm.addEventListener('submit', handleInvoiceSubmit);
+            }
+
+            // Client form
+            const clientForm = document.getElementById('clientForm');
+            if (clientForm) {
+                clientForm.addEventListener('submit', handleClientSubmit);
+            }
+
+            // Expense form
+            const expenseForm = document.getElementById('expenseForm');
+            if (expenseForm) {
+                expenseForm.addEventListener('submit', handleExpenseSubmit);
+            }
+
+            // Invoice item calculations
+            setupInvoiceCalculations();
+        }
+
+        function showPage(pageId) {
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === pageId) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Update pages
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === pageId) {
+                    page.classList.add('active');
+                }
+            });
+        }
+
+        function populateClientSelect() {
+            const clientSelect = document.getElementById('clientSelect');
+            if (!clientSelect) return;
+
+            clientSelect.innerHTML = '<option value="">Select a client</option>' +
+                clients.map(client => `<option value="${client.id}">${client.name}</option>`).join('');
+        }
+
+        function handleInvoiceSubmit(e) {
+            e.preventDefault();
+            showToast('Invoice saved successfully!', 'success');
+        }
+
+        function handleClientSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('clientName').value.trim(),
+                email: document.getElementById('clientEmail').value.trim(),
+                phone: document.getElementById('clientPhone').value.trim(),
+                address: document.getElementById('clientAddress').value.trim(),
+                gst_number: document.getElementById('clientGst').value.trim()
+            };
+
+            if (!formData.name || !formData.email) {
+                showToast('Name and email are required', 'error');
+                return;
+            }
+
+            if (currentEditingClient) {
+                showToast('Client updated successfully', 'success');
+            } else {
+                showToast('Client added successfully', 'success');
+            }
+
+            closeModal('clientModal');
+            resetClientForm();
+        }
+
+        function handleExpenseSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('expenseDate').value,
+                category: document.getElementById('expenseCategory').value,
+                description: document.getElementById('expenseDescription').value.trim(),
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                receipt_number: document.getElementById('expenseReceipt').value.trim(),
+                notes: document.getElementById('expenseNotes').value.trim()
+            };
+
+            if (!formData.date || !formData.category || !formData.description || !formData.amount) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            if (currentEditingExpense) {
+                showToast('Expense updated successfully', 'success');
+            } else {
+                showToast('Expense added successfully', 'success');
+            }
+
+            closeModal('expenseModal');
+            resetExpenseForm();
+        }
+
+        function setupInvoiceCalculations() {
+            const itemsContainer = document.getElementById('itemsContainer');
+            if (!itemsContainer) return;
+
+            itemsContainer.addEventListener('input', function(e) {
+                if (e.target.classList.contains('item-quantity') || e.target.classList.contains('item-rate')) {
+                    const row = e.target.closest('.item-row');
+                    calculateItemAmount(row);
+                    calculateInvoiceTotal();
+                }
+            });
+        }
+
+        function calculateItemAmount(row) {
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+            const amount = quantity * rate;
+            
+            row.querySelector('.item-amount').value = amount.toFixed(2);
+        }
+
+        function calculateInvoiceTotal() {
+            const itemRows = document.querySelectorAll('.item-row');
+            let subtotal = 0;
+
+            itemRows.forEach(row => {
+                const amount = parseFloat(row.querySelector('.item-amount').value) || 0;
+                subtotal += amount;
+            });
+
+            const cgst = subtotal * 0.09;
+            const sgst = subtotal * 0.09;
+            const total = subtotal + cgst + sgst;
+
+            document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('cgst').textContent = `₹${cgst.toFixed(2)}`;
+            document.getElementById('sgst').textContent = `₹${sgst.toFixed(2)}`;
+            document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function addItem() {
+            const itemsContainer = document.getElementById('itemsContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'item-row';
+            newItem.innerHTML = `
+                <input type="text" placeholder="Description" class="item-description" required>
+                <input type="number" placeholder="Qty" class="item-quantity" min="1" required>
+                <input type="number" placeholder="Rate" class="item-rate" step="0.01" required>
+                <input type="number" placeholder="Amount" class="item-amount" readonly>
+                <button type="button" class="remove-item" onclick="removeItem(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            itemsContainer.appendChild(newItem);
+        }
+
+        function removeItem(button) {
+            const row = button.closest('.item-row');
+            row.remove();
+            calculateInvoiceTotal();
+        }
+
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function resetClientForm() {
+            currentEditingClient = null;
+            const clientForm = document.getElementById('clientForm');
+            if (clientForm) clientForm.reset();
+            const clientModalTitle = document.getElementById('clientModalTitle');
+            if (clientModalTitle) clientModalTitle.textContent = 'Add New Client';
+        }
+
+        function resetExpenseForm() {
+            currentEditingExpense = null;
+            const expenseForm = document.getElementById('expenseForm');
+            if (expenseForm) expenseForm.reset();
+            const expenseModalTitle = document.getElementById('expenseModalTitle');
+            if (expenseModalTitle) expenseModalTitle.textContent = 'Add New Expense';
+        }
+
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const invoiceDateInput = document.getElementById('invoiceDate');
+            const expenseDateInput = document.getElementById('expenseDate');
+            
+            if (invoiceDateInput) invoiceDateInput.value = today;
+            if (expenseDateInput) expenseDateInput.value = today;
+        }
+
+        function generatePDF() {
+            showToast('PDF generation feature coming soon!', 'success');
+        }
+
+        function exportClients() {
+            showToast('Client export feature coming soon!', 'success');
+        }
+
+        function exportExpenses() {
+            showToast('Expense export feature coming soon!', 'success');
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // ESC key to close modals
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal.show');
+                if (openModal) {
+                    openModal.classList.remove('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
