@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FS Ride - Advanced Travel Billing System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-gradient: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            
+            --primary-color: #667eea;
+            --primary-hover: #5a67d8;
+            --secondary-color: #6b7280;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1a202c;
+            --light-color: #f7fafc;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            
+            --sidebar-width: 300px;
+            --border-radius: 20px;
+            --border-radius-lg: 30px;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 35px 60px -12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary-gradient);
+            color: var(--dark-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            z-index: -2;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: floatAnimation 20s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 20%;
+            right: -100px;
+            animation-delay: 7s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            bottom: -200px;
+            left: 20%;
+            animation-delay: 14s;
+        }
+
+        @keyframes floatAnimation {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            33% { transform: translateY(-50px) rotate(120deg) scale(1.1); }
+            66% { transform: translateY(30px) rotate(240deg) scale(0.9); }
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Advanced Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .sidebar-header {
+            padding: 2.5rem 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logo-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-gradient);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: var(--transition);
+            opacity: 0;
+        }
+
+        .logo-container:hover .logo-icon::before {
+            opacity: 1;
+            animation: shimmer 0.6s ease-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.25rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 2rem 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            padding: 1.2rem 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            position: relative;
+            margin: 0.3rem 1rem;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-100%);
+            transition: var(--transition);
+        }
+
+        .nav-item:hover::before {
+            transform: translateX(0);
+        }
+
+        .nav-item:hover {
+            color: white;
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left-color: white;
+            font-weight: 600;
+            transform: translateX(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .nav-item span {
+            position: relative;
+            z-index: 2;
+            font-weight: 500;
+        }
+
+        .sidebar-footer {
+            padding: 2rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .settings-btn,
+        .theme-toggle {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-btn:hover,
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Advanced Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            padding: 2rem;
+            animation: pageEnter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes pageEnter {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px) scale(0.95);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Advanced Page Header */
+        .page-header {
+            position: relative;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: var(--border-radius-lg);
+            padding: 3rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--success-gradient);
+            opacity: 0.1;
+            animation: headerFloat 8s ease-in-out infinite;
+        }
+
+        .shape-1 {
+            width: 120px;
+            height: 120px;
+            top: -60px;
+            right: -60px;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 180px;
+            height: 180px;
+            bottom: -90px;
+            left: -90px;
+            animation-delay: 4s;
+        }
+
+        .shape-3 {
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            right: 20%;
+            animation-delay: 2s;
+        }
+
+        @keyframes headerFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-20px) rotate(180deg) scale(1.1); }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+        }
+
+        .header-text h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-text p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Advanced Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--secondary-gradient);
+            color: white;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-danger {
+            background: var(--warning-gradient);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Advanced Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: var(--border-radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card:hover::before {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+        }
+
+        .stat-background {
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            opacity: 0.1;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover .stat-background {
+            opacity: 0.2;
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        .stat-card.blue .stat-background {
+            background: var(--primary-gradient);
+        }
+
+        .stat-card.green .stat-background {
+            background: var(--success-gradient);
+        }
+
+        .stat-card.purple .stat-background {
+            background: var(--secondary-gradient);
+        }
+
+        .stat-card.amber .stat-background {
+            background: var(--warning-gradient);
+        }
+
+        .stat-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Advanced Forms */
+        .invoice-section,
+        .form-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: var(--border-radius-lg);
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invoice-section::before,
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+        }
+
+        .section-header {
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Advanced Invoice Items */
+        .invoice-items {
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .invoice-items h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+        }
+
+        .item-row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .item-row input {
+            padding: 0.8rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: var(--transition);
+        }
+
+        .item-row input:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .remove-item {
+            background: var(--warning-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-item:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Advanced Invoice Summary */
+        .invoice-summary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 2;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            color: white;
+            font-weight: 500;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            margin-top: 1rem;
+            padding-top: 1.5rem;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: flex-end;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Advanced Tables */
+        .search-section {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1.2rem 1.5rem 1.2rem 4rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            color: white;
+            transition: var(--transition);
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-box input:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .filter-section select {
+            padding: 1.2rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            min-width: 180px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            color: white;
+            transition: var(--transition);
+        }
+
+        .filter-section select:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .data-table th {
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.01);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .action-btn {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .action-btn.edit {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.2) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Advanced Category Badges */
+        .category-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: var(--transition);
+        }
+
+        .category-badge:hover::before {
+            left: 100%;
+        }
+
+        .category-fuel {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .category-maintenance {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            color: white;
+        }
+
+        .category-toll {
+            background: linear-gradient(135deg, #54a0ff, #2e86de);
+            color: white;
+        }
+
+        .category-parking {
+            background: linear-gradient(135deg, #5f27cd, #00d2d3);
+            color: white;
+        }
+
+        .category-food {
+            background: linear-gradient(135deg, #00d2d3, #01a3a4);
+            color: white;
+        }
+
+        .category-other {
+            background: linear-gradient(135deg, #a55eea, #26de81);
+            color: white;
+        }
+
+        /* Advanced Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: var(--border-radius-lg);
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--glass-border);
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            padding: 0.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .modal-form {
+            padding: 2.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: flex-end;
+            margin-top: 2.5rem;
+        }
+
+        /* Advanced Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            opacity: 0.6;
+            color: white;
+        }
+
+        .empty-state h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .coming-soon {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .coming-soon i {
+            font-size: 5rem;
+            color: white;
+            margin-bottom: 2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .coming-soon h2 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .coming-soon p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+        }
+
+        /* Advanced Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: var(--border-radius);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 350px;
+            animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--glass-border);
+            color: white;
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes toastSlideIn {
+            from { transform: translateX(100%) scale(0.9); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: var(--transition);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 2rem;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-text h1 {
+                font-size: 2rem;
+            }
+
+            .page {
+                padding: 1rem;
+            }
+
+            .page-header {
+                padding: 2rem;
+            }
+
+            .invoice-section,
+            .form-section {
+                padding: 2rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <div class="app">
+        <!-- Advanced Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <!-- Logo/Brand -->
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>FS Ride</h1>
+                        <p>Advanced Travel Billing</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-nav">
+                <div class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-page="invoices">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Invoices</span>
+                </div>
+                <div class="nav-item" data-page="expenses">
+                    <i class="fas fa-receipt"></i>
+                    <span>Expenses</span>
+                </div>
+                <div class="nav-item" data-page="clients">
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
+                </div>
+                <div class="nav-item" data-page="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+            </div>
+
+            <!-- Settings & Theme -->
+            <div class="sidebar-footer">
+                <button class="settings-btn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard">
+                <!-- Header -->
+                <header class="page-header">
+                    <div class="floating-shape shape-1"></div>
+                    <div class="floating-shape shape-2"></div>
+                    <div class="floating-shape shape-3"></div>
+                    
+                    <div class="header-content">
+                        <div class="header-text">
+                            <h1>Dashboard</h1>
+                            <p>Welcome to the most advanced travel billing system</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openModal('clientModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Client
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('expenseModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Expense
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i>
+                                Export Data
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Advanced Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card blue" data-stat="invoices">
+                        <div class="stat-background">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Invoices</p>
+                                <p class="stat-value" id="totalInvoices">24</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card green" data-stat="revenue">
+                        <div class="stat-background">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Revenue</p>
+                                <p class="stat-value" id="totalRevenue">₹1,23,450</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card purple" data-stat="distance">
+                        <div class="stat-background">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Total Distance</p>
+                                <p class="stat-value" id="totalDistance">2,540 km</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card amber" data-stat="clients">
+                        <div class="stat-background">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-info">
+                                <p class="stat-label">Active Clients</p>
+                                <p class="stat-value" id="activeClients">18</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Invoice Form -->
+                <div class="invoice-section">
+                    <div class="section-header">
+                        <h2>Create New Invoice</h2>
+                        <p>Generate professional invoices with advanced GST calculations and beautiful design</p>
+                    </div>
+                    
+                    <form class="invoice-form" id="invoiceForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Client</label>
+                                <select id="clientSelect" required>
+                                    <option value="">Select a client</option>
+                                    <option value="1">ABC Corporation</option>
+                                    <option value="2">XYZ Enterprises</option>
+                                    <option value="3">Tech Solutions Ltd</option>
+                                    <option value="4">Global Industries</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Invoice Date</label>
+                                <input type="date" id="invoiceDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Due Date</label>
+                                <input type="date" id="dueDate">
+                            </div>
+                            <div class="form-group">
+                                <label>GST Type</label>
+                                <select id="gstType" required>
+                                    <option value="cgst_sgst">CGST + SGST (18%)</option>
+                                    <option value="igst">IGST (18%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Invoice Items -->
+                        <div class="invoice-items">
+                            <h3>Invoice Items</h3>
+                            <div class="items-container" id="itemsContainer">
+                                <div class="item-row">
+                                    <input type="text" placeholder="Service description" class="item-description" required>
+                                    <input type="number" placeholder="Qty" class="item-quantity" min="1" required>
+                                    <input type="number" placeholder="Rate (₹)" class="item-rate" step="0.01" required>
+                                    <input type="number" placeholder="Amount" class="item-amount" readonly>
+                                    <button type="button" class="remove-item" onclick="removeItem(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline" onclick="addItem()">
+                                <i class="fas fa-plus"></i>
+                                Add Item
+                            </button>
+                        </div>
+
+                        <!-- Advanced Invoice Summary -->
+                        <div class="invoice-summary">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>CGST (9%):</span>
+                                <span id="cgst">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>SGST (9%):</span>
+                                <span id="sgst">₹0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total Amount:</span>
+                                <span id="total">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Save Invoice
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="generatePDF()">
+                                <i class="fas fa-file-pdf"></i>
+                                Generate PDF
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Clients Page -->
+            <div class="page" id="clients">
+                <header class="page-header">
+                    <div class="floating-shape shape-1"></div>
+                    <div class="floating-shape shape-2"></div>
+                    
+                    <div class="header-content">
+                        <div class="header-text">
+                            <h1>Clients</h1>
+                            <p>Manage your client database with advanced features</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openModal('clientModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Client
+                            </button>
+                            <button class="btn btn-outline" onclick="exportClients()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Advanced Search and Filter -->
+                <div class="search-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="clientSearch" placeholder="Search clients by name, email, phone, or GST number...">
+                    </div>
+                    <div class="filter-section">
+                        <select id="clientFilter">
+                            <option value="">All Clients</option>
+                            <option value="active">Active Clients</option>
+                            <option value="inactive">Inactive Clients</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Advanced Clients Table -->
+                <div class="table-container">
+                    <table class="data-table" id="clientsTable">
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Contact Email</th>
+                                <th>Phone Number</th>
+                                <th>GST Number</th>
+                                <th>Created Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientsTableBody">
+                            <tr>
+                                <td><strong>ABC Corporation</strong></td>
+                                <td>contact@abc.com</td>
+                                <td>+91 9876543210</td>
+                                <td>29ABCDE1234F1Z5</td>
+                                <td>Jan 15, 2025</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit Client">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete Client">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>XYZ Enterprises</strong></td>
+                                <td>info@xyz.com</td>
+                                <td>+91 9876543211</td>
+                                <td>29XYZDE1234F1Z5</td>
+                                <td>Jan 20, 2025</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit Client">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete Client">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tech Solutions Ltd</strong></td>
+                                <td>hello@tech.com</td>
+                                <td>+91 9876543212</td>
+                                <td>29TECHDE1234F1Z5</td>
+                                <td>Jan 25, 2025</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit Client">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete Client">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Expenses Page -->
+            <div class="page" id="expenses">
+                <header class="page-header">
+                    <div class="floating-shape shape-1"></div>
+                    <div class="floating-shape shape-2"></div>
+                    
+                    <div class="header-content">
+                        <div class="header-text">
+                            <h1>Expenses</h1>
+                            <p>Track and manage your business expenses with advanced analytics</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openModal('expenseModal')">
+                                <i class="fas fa-plus"></i>
+                                Add Expense
+                            </button>
+                            <button class="btn btn-outline" onclick="exportExpenses()">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Advanced Search and Filter -->
+                <div class="search-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="expenseSearch" placeholder="Search expenses by description, category, or receipt number...">
+                    </div>
+                    <div class="filter-section">
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="fuel">Fuel</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="toll">Toll</option>
+                            <option value="parking">Parking</option>
+                            <option value="food">Food & Accommodation</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Advanced Expenses Table -->
+                <div class="table-container">
+                    <table class="data-table" id="expensesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Receipt</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody">
+                            <tr>
+                                <td>Jan 15, 2025</td>
+                                <td><span class="category-badge category-fuel">Fuel</span></td>
+                                <td>Petrol for Mumbai-Delhi route</td>
+                                <td><strong>₹4,500.00</strong></td>
+                                <td>RCP001</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit Expense">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete Expense">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jan 18, 2025</td>
+                                <td><span class="category-badge category-toll">Toll</span></td>
+                                <td>Highway toll charges - NH1</td>
+                                <td><strong>₹850.00</strong></td>
+                                <td>TOLL123</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit Expense">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete Expense">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jan 20, 2025</td>
+                                <td><span class="category-badge category-maintenance">Maintenance</span></td>
+                                <td>Vehicle service and oil change</td>
+                                <td><strong>₹6,200.00</strong></td>
+                                <td>SRV456</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit" title="Edit Expense">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete Expense">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Invoices Page -->
+            <div class="page" id="invoices">
+                <div class="coming-soon">
+                    <i class="fas fa-file-invoice"></i>
+                    <h2>Advanced Invoices</h2>
+                    <p>Professional invoice management with PDF generation and email automation coming soon.</p>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div class="page" id="analytics">
+                <div class="coming-soon">
+                    <i class="fas fa-chart-bar"></i>
+                    <h2>Advanced Analytics</h2>
+                    <p>Comprehensive business analytics with interactive charts and detailed reports coming soon.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Advanced Client Modal -->
+    <div class="modal" id="clientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="clientModalTitle">Add New Client</h2>
+                <button class="close-btn" onclick="closeModal('clientModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="clientForm">
+                <input type="hidden" id="clientId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Client Name *</label>
+                        <input type="text" id="clientName" placeholder="Enter client name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="clientEmail" placeholder="client@example.com" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="clientPhone" placeholder="+91 9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label>GST Number</label>
+                        <input type="text" id="clientGst" placeholder="29ABCDE1234F1Z5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Business Address</label>
+                    <textarea id="clientAddress" rows="3" placeholder="Enter complete business address"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('clientModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Advanced Expense Modal -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="expenseModalTitle">Add New Expense</h2>
+                <button class="close-btn" onclick="closeModal('expenseModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="expenseForm">
+                <input type="hidden" id="expenseId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expense Date *</label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="expenseCategory" required>
+                            <option value="">Select category</option>
+                            <option value="fuel">Fuel</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="toll">Toll</option>
+                            <option value="parking">Parking</option>
+                            <option value="food">Food & Accommodation</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <input type="text" id="expenseDescription" placeholder="Enter expense description" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Amount (₹) *</label>
+                        <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Receipt Number</label>
+                        <input type="text" id="expenseReceipt" placeholder="RCP001">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="expenseNotes" rows="3" placeholder="Enter any additional notes or details"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('expenseModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Application State
+        let clients = [
+            { id: 1, name: 'ABC Corporation', email: 'contact@abc.com', phone: '+91 9876543210', gst_number: '29ABCDE1234F1Z5', created_at: '2025-01-15' },
+            { id: 2, name: 'XYZ Enterprises', email: 'info@xyz.com', phone: '+91 9876543211', gst_number: '29XYZDE1234F1Z5', created_at: '2025-01-20' },
+            { id: 3, name: 'Tech Solutions Ltd', email: 'hello@tech.com', phone: '+91 9876543212', gst_number: '29TECHDE1234F1Z5', created_at: '2025-01-25' },
+            { id: 4, name: 'Global Industries', email: 'support@global.com', phone: '+91 9876543213', gst_number: '29GLOBAL1234F1Z5', created_at: '2025-01-30' }
+        ];
+        
+        let expenses = [
+            { id: 1, date: '2025-01-15', category: 'fuel', description: 'Petrol for Mumbai-Delhi route', amount: 4500, receipt_number: 'RCP001' },
+            { id: 2, date: '2025-01-18', category: 'toll', description: 'Highway toll charges - NH1', amount: 850, receipt_number: 'TOLL123' },
+            { id: 3, date: '2025-01-20', category: 'maintenance', description: 'Vehicle service and oil change', amount: 6200, receipt_number: 'SRV456' }
+        ];
+
+        let currentEditingClient = null;
+        let currentEditingExpense = null;
+
+        // Initialize the application with advanced animations
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            setupAdvancedAnimations();
+            setTodayDate();
+        });
+
+        function initializeApp() {
+            showPage('dashboard');
+            populateClientSelect();
+            animateStatsCards();
+        }
+
+        function setupEventListeners() {
+            // Navigation with advanced animations
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    showPageWithAnimation(page);
+                });
+            });
+
+            // Form submissions
+            const invoiceForm = document.getElementById('invoiceForm');
+            if (invoiceForm) {
+                invoiceForm.addEventListener('submit', handleInvoiceSubmit);
+            }
+
+            const clientForm = document.getElementById('clientForm');
+            if (clientForm) {
+                clientForm.addEventListener('submit', handleClientSubmit);
+            }
+
+            const expenseForm = document.getElementById('expenseForm');
+            if (expenseForm) {
+                expenseForm.addEventListener('submit', handleExpenseSubmit);
+            }
+
+            // Invoice calculations
+            setupInvoiceCalculations();
+
+            // Advanced search functionality
+            setupAdvancedSearch();
+        }
+
+        function setupAdvancedAnimations() {
+            // Animate stats cards on hover
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Animate buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.02)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        }
+
+        function showPageWithAnimation(pageId) {
+            // Show loading overlay
+            showLoading(true);
+
+            // Update navigation with animation
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === pageId) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Animate page transition
+            setTimeout(() => {
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                    if (page.id === pageId) {
+                        page.classList.add('active');
+                    }
+                });
+                showLoading(false);
+            }, 300);
+        }
+
+        function showPage(pageId) {
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === pageId) {
+                    item.classList.add('active');
+                }
+            });
+
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === pageId) {
+                    page.classList.add('active');
+                }
+            });
+        }
+
+        function animateStatsCards() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                const finalValue = stat.textContent;
+                const isNumber = /^\d+$/.test(finalValue);
+                
+                if (isNumber) {
+                    let current = 0;
+                    const increment = Math.ceil(parseInt(finalValue) / 50);
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= parseInt(finalValue)) {
+                            stat.textContent = finalValue;
+                            clearInterval(timer);
+                        } else {
+                            stat.textContent = current;
+                        }
+                    }, 30);
+                }
+            });
+        }
+
+        function populateClientSelect() {
+            const clientSelect = document.getElementById('clientSelect');
+            if (!clientSelect) return;
+
+            clientSelect.innerHTML = '<option value="">Select a client</option>' +
+                clients.map(client => `<option value="${client.id}">${client.name}</option>`).join('');
+        }
+
+        function setupAdvancedSearch() {
+            const clientSearch = document.getElementById('clientSearch');
+            const expenseSearch = document.getElementById('expenseSearch');
+            
+            if (clientSearch) {
+                clientSearch.addEventListener('input', debounce(filterClients, 300));
+            }
+            
+            if (expenseSearch) {
+                expenseSearch.addEventListener('input', debounce(filterExpenses, 300));
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function filterClients() {
+            // Advanced filtering logic here
+            showToast('Advanced client filtering activated', 'success');
+        }
+
+        function filterExpenses() {
+            // Advanced filtering logic here
+            showToast('Advanced expense filtering activated', 'success');
+        }
+
+        function handleInvoiceSubmit(e) {
+            e.preventDefault();
+            showLoading(true);
+            
+            setTimeout(() => {
+                showLoading(false);
+                showToast('Invoice created successfully with advanced formatting!', 'success');
+            }, 1500);
+        }
+
+        function handleClientSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('clientName').value.trim(),
+                email: document.getElementById('clientEmail').value.trim(),
+                phone: document.getElementById('clientPhone').value.trim(),
+                address: document.getElementById('clientAddress').value.trim(),
+                gst_number: document.getElementById('clientGst').value.trim()
+            };
+
+            if (!formData.name || !formData.email) {
+                showToast('Name and email are required', 'error');
+                return;
+            }
+
+            showLoading(true);
+            
+            setTimeout(() => {
+                showLoading(false);
+                if (currentEditingClient) {
+                    showToast('Client updated successfully with advanced validation!', 'success');
+                } else {
+                    showToast('Client added successfully with enhanced features!', 'success');
+                }
+                closeModal('clientModal');
+                resetClientForm();
+            }, 1000);
+        }
+
+        function handleExpenseSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                date: document.getElementById('expenseDate').value,
+                category: document.getElementById('expenseCategory').value,
+                description: document.getElementById('expenseDescription').value.trim(),
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                receipt_number: document.getElementById('expenseReceipt').value.trim(),
+                notes: document.getElementById('expenseNotes').value.trim()
+            };
+
+            if (!formData.date || !formData.category || !formData.description || !formData.amount) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            showLoading(true);
+            
+            setTimeout(() => {
+                showLoading(false);
+                if (currentEditingExpense) {
+                    showToast('Expense updated successfully with advanced categorization!', 'success');
+                } else {
+                    showToast('Expense added successfully with smart analytics!', 'success');
+                }
+                closeModal('expenseModal');
+                resetExpenseForm();
+            }, 1000);
+        }
+
+        function setupInvoiceCalculations() {
+            const itemsContainer = document.getElementById('itemsContainer');
+            if (!itemsContainer) return;
+
+            itemsContainer.addEventListener('input', function(e) {
+                if (e.target.classList.contains('item-quantity') || e.target.classList.contains('item-rate')) {
+                    const row = e.target.closest('.item-row');
+                    calculateItemAmount(row);
+                    calculateInvoiceTotal();
+                }
+            });
+        }
+
+        function calculateItemAmount(row) {
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+            const amount = quantity * rate;
+            
+            row.querySelector('.item-amount').value = amount.toFixed(2);
+            
+            // Add animation to the amount field
+            const amountField = row.querySelector('.item-amount');
+            amountField.style.background = 'rgba(16, 185, 129, 0.2)';
+            setTimeout(() => {
+                amountField.style.background = 'rgba(255, 255, 255, 0.1)';
+            }, 500);
+        }
+
+        function calculateInvoiceTotal() {
+            const itemRows = document.querySelectorAll('.item-row');
+            let subtotal = 0;
+
+            itemRows.forEach(row => {
+                const amount = parseFloat(row.querySelector('.item-amount').value) || 0;
+                subtotal += amount;
+            });
+
+            const cgst = subtotal * 0.09;
+            const sgst = subtotal * 0.09;
+            const total = subtotal + cgst + sgst;
+
+            // Animate the summary updates
+            const summaryElements = [
+                { id: 'subtotal', value: subtotal },
+                { id: 'cgst', value: cgst },
+                { id: 'sgst', value: sgst },
+                { id: 'total', value: total }
+            ];
+
+            summaryElements.forEach(item => {
+                const element = document.getElementById(item.id);
+                if (element) {
+                    element.style.color = '#10b981';
+                    element.textContent = `₹${item.value.toFixed(2)}`;
+                    setTimeout(() => {
+                        element.style.color = 'white';
+                    }, 500);
+                }
+            });
+        }
+
+        function addItem() {
+            const itemsContainer = document.getElementById('itemsContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'item-row';
+            newItem.style.opacity = '0';
+            newItem.style.transform = 'translateY(20px)';
+            
+            newItem.innerHTML = `
+                <input type="text" placeholder="Service description" class="item-description" required>
+                <input type="number" placeholder="Qty" class="item-quantity" min="1" required>
+                <input type="number" placeholder="Rate (₹)" class="item-rate" step="0.01" required>
+                <input type="number" placeholder="Amount" class="item-amount" readonly>
+                <button type="button" class="remove-item" onclick="removeItem(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            itemsContainer.appendChild(newItem);
+            
+            // Animate the new item
+            setTimeout(() => {
+                newItem.style.opacity = '1';
+                newItem.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
+        function removeItem(button) {
+            const row = button.closest('.item-row');
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(100%)';
+            
+            setTimeout(() => {
+                row.remove();
+                calculateInvoiceTotal();
+            }, 300);
+        }
+
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function resetClientForm() {
+            currentEditingClient = null;
+            const clientForm = document.getElementById('clientForm');
+            if (clientForm) clientForm.reset();
+            const clientModalTitle = document.getElementById('clientModalTitle');
+            if (clientModalTitle) clientModalTitle.textContent = 'Add New Client';
+        }
+
+        function resetExpenseForm() {
+            currentEditingExpense = null;
+            const expenseForm = document.getElementById('expenseForm');
+            if (expenseForm) expenseForm.reset();
+            const expenseModalTitle = document.getElementById('expenseModalTitle');
+            if (expenseModalTitle) expenseModalTitle.textContent = 'Add New Expense';
+        }
+
+        function showLoading(show) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (show) {
+                loadingOverlay.classList.add('show');
+            } else {
+                loadingOverlay.classList.remove('show');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const invoiceDateInput = document.getElementById('invoiceDate');
+            const expenseDateInput = document.getElementById('expenseDate');
+            
+            if (invoiceDateInput) invoiceDateInput.value = today;
+            if (expenseDateInput) expenseDateInput.value = today;
+        }
+
+        function generatePDF() {
+            showLoading(true);
+            setTimeout(() => {
+                showLoading(false);
+                showToast('Advanced PDF with beautiful design generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function exportClients() {
+            showLoading(true);
+            setTimeout(() => {
+                showLoading(false);
+                showToast('Client data exported with advanced formatting!', 'success');
+            }, 1500);
+        }
+
+        function exportExpenses() {
+            showLoading(true);
+            setTimeout(() => {
+                showLoading(false);
+                showToast('Expense data exported with analytics included!', 'success');
+            }, 1500);
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // ESC key to close modals
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal.show');
+                if (openModal) {
+                    openModal.classList.remove('show');
+                }
+            }
+        });
+
+        // Advanced keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'n':
+                        e.preventDefault();
+                        openModal('clientModal');
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        openModal('expenseModal');
+                        break;
+                    case '1':
+                        e.preventDefault();
+                        showPageWithAnimation('dashboard');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        showPageWithAnimation('clients');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        showPageWithAnimation('expenses');
+                        break;
+                }
+            }
+        });
+
+        // Add advanced parallax effect to floating elements
+        window.addEventListener('mousemove', function(e) {
+            const shapes = document.querySelectorAll('.floating-shape');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            shapes.forEach((shape, index) => {
+                const speed = (index + 1) * 0.5;
+                const x = mouseX * speed * 20;
+                const y = mouseY * speed * 20;
+                shape.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

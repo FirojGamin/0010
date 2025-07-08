@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FS RIDE - Premium Travel Billing System</title>
+    <meta name="description" content="Complete travel billing and management system with client management, trip tracking, expense monitoring, and automated invoicing">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary: 222.2 84% 4.9%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96%;
+            --secondary-foreground: 222.2 84% 4.9%;
+            --muted: 210 40% 96%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96%;
+            --accent-foreground: 222.2 84% 4.9%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 222.2 84% 4.9%;
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 222.2 84% 4.9%;
+        }
+        
+        .dark {
+            --primary: 210 40% 98%;
+            --primary-foreground: 222.2 84% 4.9%;
+            --secondary: 222.2 84% 4.9%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 222.2 84% 4.9%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 222.2 84% 4.9%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 212.7 26.8% 83.9%;
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .dark .glass-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 flex items-center gap-2;
+        }
+        
+        .btn-secondary {
+            @apply bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-all duration-200 flex items-center gap-2;
+        }
+        
+        .dark .btn-secondary {
+            @apply bg-gray-800 hover:bg-gray-700 text-gray-200;
+        }
+        
+        .stat-card {
+            @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-xl transition-all duration-300;
+        }
+        
+        .status-badge {
+            @apply px-2 py-1 text-xs font-medium rounded-full;
+        }
+        
+        .status-active {
+            @apply bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400;
+        }
+        
+        .status-completed {
+            @apply bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400;
+        }
+        
+        .status-cancelled {
+            @apply bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400;
+        }
+        
+        .status-paid {
+            @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400;
+        }
+        
+        .status-sent {
+            @apply bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400;
+        }
+        
+        .status-draft {
+            @apply bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400;
+        }
+        
+        .status-overdue {
+            @apply bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .animate-bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        
+        .sidebar {
+            @apply w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-screen fixed left-0 top-0 z-10 transition-all duration-300;
+        }
+        
+        .main-content {
+            @apply ml-64 min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-300;
+        }
+        
+        .nav-item {
+            @apply flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 cursor-pointer;
+        }
+        
+        .nav-item.active {
+            @apply bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400;
+        }
+        
+        .modal {
+            @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+        }
+        
+        .modal-content {
+            @apply bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto;
+        }
+        
+        .form-group {
+            @apply mb-4;
+        }
+        
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+        }
+        
+        .form-input {
+            @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
+        }
+        
+        .form-select {
+            @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
+        }
+        
+        .form-textarea {
+            @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <div id="app" class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i data-lucide="car" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800 dark:text-white">FS RIDE</h1>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Travel Billing</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="p-4 space-y-2">
+                <div class="nav-item active" onclick="showPage('dashboard')">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showPage('trips')">
+                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                    <span>Trip Billing</span>
+                </div>
+                <div class="nav-item" onclick="showPage('clients')">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Clients</span>
+                </div>
+                <div class="nav-item" onclick="showPage('expenses')">
+                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                    <span>Expenses</span>
+                </div>
+                <div class="nav-item" onclick="showPage('invoices')">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>Invoices</span>
+                </div>
+                <div class="nav-item" onclick="showPage('analytics')">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    <span>Analytics</span>
+                </div>
+            </nav>
+            
+            <div class="absolute bottom-4 left-4 right-4">
+                <button onclick="toggleTheme()" class="btn-secondary w-full">
+                    <i data-lucide="moon" class="w-5 h-5"></i>
+                    <span>Toggle Theme</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 id="page-title" class="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
+                        <p id="page-subtitle" class="text-gray-500 dark:text-gray-400">Welcome to your travel billing system</p>
+                    </div>
+                    <button onclick="showNewTripModal()" class="btn-primary">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span>New Trip</span>
+                    </button>
+                </div>
+            </header>
+            
+            <main class="p-6">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white animate-bounce-in">$12,580</p>
+                                    <p class="text-xs text-green-600 dark:text-green-400 mt-1">+12.5% from last month</p>
+                                </div>
+                                <div class="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Trips</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white animate-bounce-in">24</p>
+                                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">+8 this week</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                                    <i data-lucide="map-pin" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Clients</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white animate-bounce-in">156</p>
+                                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">+15 this month</p>
+                                </div>
+                                <div class="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                    <i data-lucide="users" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Monthly Expenses</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white animate-bounce-in">$3,420</p>
+                                    <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">-5.2% from last month</p>
+                                </div>
+                                <div class="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                                    <i data-lucide="receipt" class="w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Revenue Trend</h3>
+                            <canvas id="revenueChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Expense Breakdown</h3>
+                            <canvas id="expenseChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Recent Trips</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                                            <i data-lucide="map-pin" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white">Downtown → Airport</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">John Smith • 2 hours ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-gray-900 dark:text-white">$45.00</p>
+                                        <span class="status-badge status-completed">Completed</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                                            <i data-lucide="map-pin" class="w-5 h-5 text-green-600 dark:text-green-400"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white">Hotel → Business District</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Sarah Johnson • 4 hours ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-gray-900 dark:text-white">$32.50</p>
+                                        <span class="status-badge status-active">Active</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
+                                            <i data-lucide="map-pin" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white">Mall → Residential</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Mike Wilson • 6 hours ago</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-gray-900 dark:text-white">$28.75</p>
+                                        <span class="status-badge status-completed">Completed</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Top Clients</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-medium text-blue-600 dark:text-blue-400">JS</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white">John Smith</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">12 trips</p>
+                                        </div>
+                                    </div>
+                                    <p class="font-bold text-gray-900 dark:text-white">$540</p>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-medium text-green-600 dark:text-green-400">SJ</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white">Sarah Johnson</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">8 trips</p>
+                                        </div>
+                                    </div>
+                                    <p class="font-bold text-gray-900 dark:text-white">$320</p>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
+                                            <span class="text-sm font-medium text-purple-600 dark:text-purple-400">MW</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white">Mike Wilson</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">6 trips</p>
+                                        </div>
+                                    </div>
+                                    <p class="font-bold text-gray-900 dark:text-white">$240</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trips Page -->
+                <div id="trips-page" class="page-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Trips</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">89</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                                    <i data-lucide="map-pin" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Trips</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">24</p>
+                                </div>
+                                <div class="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                                    <i data-lucide="activity" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Completed</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">58</p>
+                                </div>
+                                <div class="p-3 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg">
+                                    <i data-lucide="check-circle" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg. Trip Value</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$42</p>
+                                </div>
+                                <div class="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Trip Records</h3>
+                            <div class="flex items-center gap-4">
+                                <div class="relative">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                    <input type="text" placeholder="Search trips..." class="form-input pl-10 w-64">
+                                </div>
+                                <button onclick="showNewTripModal()" class="btn-primary">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    New Trip
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="map-pin" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Downtown → Airport</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">John Smith • Business</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">December 15, 2024 • 15.2 miles</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$45.00</p>
+                                    <span class="status-badge status-completed">Completed</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="map-pin" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Hotel → Business District</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Sarah Johnson • Corporate</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">December 14, 2024 • 8.7 miles</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$32.50</p>
+                                    <span class="status-badge status-active">Active</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="map-pin" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Mall → Residential</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Mike Wilson • Personal</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">December 13, 2024 • 12.3 miles</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$28.75</p>
+                                    <span class="status-badge status-completed">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Clients Page -->
+                <div id="clients-page" class="page-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Clients</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">156</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                                    <i data-lucide="users" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Clients</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">142</p>
+                                </div>
+                                <div class="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                                    <i data-lucide="user-check" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Premium Clients</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">23</p>
+                                </div>
+                                <div class="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                    <i data-lucide="star" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg. Client Value</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$215</p>
+                                </div>
+                                <div class="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Client Directory</h3>
+                            <div class="flex items-center gap-4">
+                                <div class="relative">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                    <input type="text" placeholder="Search clients..." class="form-input pl-10 w-64">
+                                </div>
+                                <button onclick="showNewClientModal()" class="btn-primary">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    New Client
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                                        <span class="text-lg font-medium text-blue-600 dark:text-blue-400">JS</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">John Smith</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">john@email.com • +1 (555) 123-4567</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Tech Solutions Inc.</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$540.00</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">12 trips</p>
+                                    <span class="status-badge status-active">Premium</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                                        <span class="text-lg font-medium text-green-600 dark:text-green-400">SJ</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Sarah Johnson</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">sarah@email.com • +1 (555) 987-6543</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Marketing Agency</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$320.00</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">8 trips</p>
+                                    <span class="status-badge status-active">Active</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
+                                        <span class="text-lg font-medium text-purple-600 dark:text-purple-400">MW</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Mike Wilson</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">mike@email.com • +1 (555) 456-7890</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Freelance Designer</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$240.00</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">6 trips</p>
+                                    <span class="status-badge status-active">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Expenses Page -->
+                <div id="expenses-page" class="page-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$3,420</p>
+                                </div>
+                                <div class="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg">
+                                    <i data-lucide="receipt" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Fuel Costs</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$1,580</p>
+                                </div>
+                                <div class="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                                    <i data-lucide="fuel" class="w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Maintenance</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$890</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                                    <i data-lucide="wrench" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Insurance</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$950</p>
+                                </div>
+                                <div class="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                                    <i data-lucide="shield" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Expense Records</h3>
+                            <div class="flex items-center gap-4">
+                                <div class="relative">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                    <input type="text" placeholder="Search expenses..." class="form-input pl-10 w-64">
+                                </div>
+                                <button onclick="showNewExpenseModal()" class="btn-primary">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    New Expense
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="fuel" class="w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Fuel Fill-up</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Shell Gas Station</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">December 15, 2024</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$65.40</p>
+                                    <span class="status-badge status-completed">Fuel</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="wrench" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Oil Change</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Quick Lube Service</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">December 12, 2024</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$45.00</p>
+                                    <span class="status-badge status-completed">Maintenance</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="shield" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Insurance Premium</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Auto Insurance Co.</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">December 1, 2024</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$320.00</p>
+                                    <span class="status-badge status-completed">Insurance</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Invoices Page -->
+                <div id="invoices-page" class="page-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Invoices</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">45</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                                    <i data-lucide="file-text" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Paid Amount</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$8,450</p>
+                                </div>
+                                <div class="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                                    <i data-lucide="check-circle" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Amount</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$2,130</p>
+                                </div>
+                                <div class="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                                    <i data-lucide="clock" class="w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Overdue Amount</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$580</p>
+                                </div>
+                                <div class="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg">
+                                    <i data-lucide="alert-circle" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Invoice Records</h3>
+                            <div class="flex items-center gap-4">
+                                <div class="relative">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                    <input type="text" placeholder="Search invoices..." class="form-input pl-10 w-64">
+                                </div>
+                                <button onclick="showNewInvoiceModal()" class="btn-primary">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    New Invoice
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="check-circle" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">#INV-001</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">John Smith • Tech Solutions Inc.</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Due: December 20, 2024</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$450.00</p>
+                                    <span class="status-badge status-paid">Paid</span>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button onclick="downloadInvoice('INV-001')" class="btn-secondary p-2">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="shareInvoice('INV-001')" class="btn-secondary p-2">
+                                            <i data-lucide="share" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="send" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">#INV-002</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Sarah Johnson • Marketing Agency</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Due: December 25, 2024</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$320.00</p>
+                                    <span class="status-badge status-sent">Sent</span>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button onclick="downloadInvoice('INV-002')" class="btn-secondary p-2">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="shareInvoice('INV-002')" class="btn-secondary p-2">
+                                            <i data-lucide="share" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="clock" class="w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">#INV-003</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Mike Wilson • Freelance Designer</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Due: December 30, 2024</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">$240.00</p>
+                                    <span class="status-badge status-draft">Draft</span>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button onclick="downloadInvoice('INV-003')" class="btn-secondary p-2">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="shareInvoice('INV-003')" class="btn-secondary p-2">
+                                            <i data-lucide="share" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analytics Page -->
+                <div id="analytics-page" class="page-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$12,580</p>
+                                    <p class="text-xs text-green-600 dark:text-green-400 mt-1">+12.5% from last month</p>
+                                </div>
+                                <div class="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Net Profit</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$9,160</p>
+                                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">72.8% margin</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                                    <i data-lucide="trending-up" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Trip Value</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$42</p>
+                                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">+15.2% from last month</p>
+                                </div>
+                                <div class="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                    <i data-lucide="car" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Client LTV</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">$215</p>
+                                    <p class="text-xs text-orange-600 dark:text-orange-400 mt-1">+8.3% from last month</p>
+                                </div>
+                                <div class="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                                    <i data-lucide="users" class="w-6 h-6 text-orange-600 dark:text-orange-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Revenue Trend</h3>
+                            <canvas id="analyticsRevenueChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Expense Breakdown</h3>
+                            <canvas id="analyticsExpenseChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Financial Summary</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Revenue</span>
+                                    <span class="text-sm font-bold text-green-600 dark:text-green-400">$12,580</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</span>
+                                    <span class="text-sm font-bold text-red-600 dark:text-red-400">$3,420</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">Net Profit</span>
+                                    <span class="text-sm font-bold text-blue-600 dark:text-blue-400">$9,160</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Performance Metrics</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Trip Value</span>
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">$42.00</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Client Value</span>
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">$215.00</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Expense Ratio</span>
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">27.2%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Growth Indicators</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Revenue Growth</span>
+                                    <span class="text-sm font-bold text-green-600 dark:text-green-400">+12.5%</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Client Growth</span>
+                                    <span class="text-sm font-bold text-green-600 dark:text-green-400">+8.3%</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Trip Growth</span>
+                                    <span class="text-sm font-bold text-green-600 dark:text-green-400">+15.2%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <!-- New Trip Modal -->
+    <div id="newTripModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">New Trip</h3>
+                <button onclick="closeModal('newTripModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <form id="newTripForm">
+                <div class="form-group">
+                    <label class="form-label">Trip Type</label>
+                    <select class="form-select" required>
+                        <option value="">Select type</option>
+                        <option value="business">Business</option>
+                        <option value="personal">Personal</option>
+                        <option value="corporate">Corporate</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Client</label>
+                    <select class="form-select" required>
+                        <option value="">Select client</option>
+                        <option value="1">John Smith</option>
+                        <option value="2">Sarah Johnson</option>
+                        <option value="3">Mike Wilson</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Pickup Location</label>
+                        <input type="text" class="form-input" placeholder="Enter pickup location" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Destination</label>
+                        <input type="text" class="form-input" placeholder="Enter destination" required>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Distance (miles)</label>
+                        <input type="number" class="form-input" placeholder="0.0" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Base Rate ($)</label>
+                        <input type="number" class="form-input" placeholder="0.00" step="0.01" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" rows="3" placeholder="Additional notes..."></textarea>
+                </div>
+                
+                <div class="flex items-center gap-4 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Create Trip</button>
+                    <button type="button" onclick="closeModal('newTripModal')" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- New Client Modal -->
+    <div id="newClientModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">New Client</h3>
+                <button onclick="closeModal('newClientModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <form id="newClientForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Enter full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" placeholder="Enter email address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" placeholder="Enter phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Company</label>
+                    <input type="text" class="form-input" placeholder="Enter company name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-textarea" rows="3" placeholder="Enter address..."></textarea>
+                </div>
+                
+                <div class="flex items-center gap-4 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Create Client</button>
+                    <button type="button" onclick="closeModal('newClientModal')" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- New Expense Modal -->
+    <div id="newExpenseModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">New Expense</h3>
+                <button onclick="closeModal('newExpenseModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <form id="newExpenseForm">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" required>
+                        <option value="">Select category</option>
+                        <option value="fuel">Fuel</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" placeholder="Enter description" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Amount ($)</label>
+                        <input type="number" class="form-input" placeholder="0.00" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Related Trip (Optional)</label>
+                    <select class="form-select">
+                        <option value="">Select trip</option>
+                        <option value="1">Downtown → Airport</option>
+                        <option value="2">Hotel → Business District</option>
+                        <option value="3">Mall → Residential</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center gap-4 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Create Expense</button>
+                    <button type="button" onclick="closeModal('newExpenseModal')" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- New Invoice Modal -->
+    <div id="newInvoiceModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">New Invoice</h3>
+                <button onclick="closeModal('newInvoiceModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <form id="newInvoiceForm">
+                <div class="form-group">
+                    <label class="form-label">Client</label>
+                    <select class="form-select" required>
+                        <option value="">Select client</option>
+                        <option value="1">John Smith</option>
+                        <option value="2">Sarah Johnson</option>
+                        <option value="3">Mike Wilson</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Trip</label>
+                    <select class="form-select" required>
+                        <option value="">Select trip</option>
+                        <option value="1">Downtown → Airport</option>
+                        <option value="2">Hotel → Business District</option>
+                        <option value="3">Mall → Residential</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Amount ($)</label>
+                        <input type="number" class="form-input" placeholder="0.00" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" rows="3" placeholder="Additional notes..."></textarea>
+                </div>
+                
+                <div class="flex items-center gap-4 pt-4">
+                    <button type="submit" class="btn-primary flex-1">Create Invoice</button>
+                    <button type="button" onclick="closeModal('newInvoiceModal')" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-4"></div>
+    
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Theme Management
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        }
+        
+        // Page Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + '-page').classList.remove('hidden');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Update header
+            updatePageHeader(pageId);
+        }
+        
+        function updatePageHeader(pageId) {
+            const titles = {
+                dashboard: 'Dashboard',
+                trips: 'Trip Billing',
+                clients: 'Clients',
+                expenses: 'Expenses',
+                invoices: 'Invoices',
+                analytics: 'Analytics'
+            };
+            
+            const subtitles = {
+                dashboard: 'Welcome to your travel billing system',
+                trips: 'Manage your trips and billing',
+                clients: 'Manage your client relationships',
+                expenses: 'Track your business expenses',
+                invoices: 'Manage your invoices and billing',
+                analytics: 'Comprehensive financial insights'
+            };
+            
+            document.getElementById('page-title').textContent = titles[pageId];
+            document.getElementById('page-subtitle').textContent = subtitles[pageId];
+        }
+        
+        // Modal Management
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+        
+        function showNewTripModal() {
+            showModal('newTripModal');
+        }
+        
+        function showNewClientModal() {
+            showModal('newClientModal');
+        }
+        
+        function showNewExpenseModal() {
+            showModal('newExpenseModal');
+        }
+        
+        function showNewInvoiceModal() {
+            showModal('newInvoiceModal');
+        }
+        
+        // Form Handlers
+        document.getElementById('newTripForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast('Trip created successfully!', 'success');
+            closeModal('newTripModal');
+            this.reset();
+        });
+        
+        document.getElementById('newClientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast('Client created successfully!', 'success');
+            closeModal('newClientModal');
+            this.reset();
+        });
+        
+        document.getElementById('newExpenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast('Expense created successfully!', 'success');
+            closeModal('newExpenseModal');
+            this.reset();
+        });
+        
+        document.getElementById('newInvoiceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showToast('Invoice created successfully!', 'success');
+            closeModal('newInvoiceModal');
+            this.reset();
+        });
+        
+        // Invoice Actions
+        function downloadInvoice(invoiceId) {
+            showToast(`Downloading invoice ${invoiceId}...`, 'info');
+            // Simulate PDF generation
+            setTimeout(() => {
+                showToast(`Invoice ${invoiceId} downloaded successfully!`, 'success');
+            }, 2000);
+        }
+        
+        function shareInvoice(invoiceId) {
+            const message = `Invoice ${invoiceId} from FS RIDE Travel Services. Please review and process payment.`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            showToast(`Sharing invoice ${invoiceId} via WhatsApp...`, 'info');
+        }
+        
+        // Toast Notifications
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `glass-card p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+            
+            const icons = {
+                success: 'check-circle',
+                error: 'x-circle',
+                info: 'info',
+                warning: 'alert-triangle'
+            };
+            
+            const colors = {
+                success: 'text-green-600 dark:text-green-400',
+                error: 'text-red-600 dark:text-red-400',
+                info: 'text-blue-600 dark:text-blue-400',
+                warning: 'text-yellow-600 dark:text-yellow-400'
+            };
+            
+            toast.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i data-lucide="${icons[type]}" class="w-5 h-5 ${colors[type]}"></i>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">${message}</p>
+                </div>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            lucide.createIcons();
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5000);
+        }
+        
+        // Charts
+        function initCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [2100, 2800, 3200, 2900, 3500, 4200],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Expense Chart
+            const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+            new Chart(expenseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fuel', 'Maintenance', 'Insurance', 'Other'],
+                    datasets: [{
+                        data: [1580, 890, 950, 320],
+                        backgroundColor: [
+                            '#f59e0b',
+                            '#3b82f6',
+                            '#10b981',
+                            '#8b5cf6'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Analytics Charts
+            const analyticsRevenueCtx = document.getElementById('analyticsRevenueChart')?.getContext('2d');
+            if (analyticsRevenueCtx) {
+                new Chart(analyticsRevenueCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [2100, 2800, 3200, 2900, 3500, 4200],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const analyticsExpenseCtx = document.getElementById('analyticsExpenseChart')?.getContext('2d');
+            if (analyticsExpenseCtx) {
+                new Chart(analyticsExpenseCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Fuel', 'Maintenance', 'Insurance', 'Other'],
+                        datasets: [{
+                            data: [1580, 890, 950, 320],
+                            backgroundColor: [
+                                '#f59e0b',
+                                '#3b82f6',
+                                '#10b981',
+                                '#8b5cf6'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            initCharts();
+            
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.add('hidden');
+                }
+            });
+            
+            // Welcome message
+            setTimeout(() => {
+                showToast('Welcome to FS RIDE Travel Billing System!', 'success');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
